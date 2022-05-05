@@ -27,5 +27,13 @@
     {% endfor %}
 </div>
 
+<div>
+    <form class="pic" method='get' action="{% url 'restart' %}">
+                <button class="pic">Restart
+                </button>
+                {% csrf_token %}
+            </form>
+</div>
+
 </body>
 </html>

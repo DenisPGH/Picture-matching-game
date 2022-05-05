@@ -24,26 +24,26 @@ class IndexView(views.TemplateView):
         context = super().get_context_data(**kwargs)
         pictures = Picture.objects.all().order_by('order').filter(order__gt=0)
         secret=Picture.objects.get(order=0)
-        if Counter.COUNTER_OPENED_IMAGES>2:
-            for each in pictures:
-                each.is_open=False
-                each.save()
-
-            if Counter.NAME_FISRT_PIC==Counter.NAME_SECOND_PIC:
-                print("match")
-                first_pic=Picture.objects.get(pk=Counter.ID_FIRST_PIC)
-                first_pic.is_known=True
-                first_pic.save()
-                second_pic = Picture.objects.get(pk=Counter.ID_SECOND_PIC)
-                second_pic.is_known = True
-                second_pic.save()
-
-
-            Counter.COUNTER_OPENED_IMAGES=0
-            Counter.NAME_FISRT_PIC=''
-            Counter.NAME_SECOND_PIC=''
-            Counter.ID_FIRST_PIC = 0
-            Counter.ID_SECOND_PIC = 0
+        # if Counter.COUNTER_OPENED_IMAGES>2:
+        #     for each in pictures:
+        #         each.is_open=False
+        #         each.save()
+        #
+        #     if Counter.NAME_FISRT_PIC==Counter.NAME_SECOND_PIC:
+        #         print("match")
+        #         first_pic=Picture.objects.get(pk=Counter.ID_FIRST_PIC)
+        #         first_pic.is_known=True
+        #         first_pic.save()
+        #         second_pic = Picture.objects.get(pk=Counter.ID_SECOND_PIC)
+        #         second_pic.is_known = True
+        #         second_pic.save()
+        #
+        #
+        #     Counter.COUNTER_OPENED_IMAGES=0
+        #     Counter.NAME_FISRT_PIC=''
+        #     Counter.NAME_SECOND_PIC=''
+        #     Counter.ID_FIRST_PIC = 0
+        #     Counter.ID_SECOND_PIC = 0
 
 
 
@@ -73,3 +73,14 @@ def update_pic(request,pk):
     # print(Counter.NAME_SECOND_PIC)
 
     return redirect('index')
+
+
+def restart(request):
+
+    for each in Picture.objects.all():
+        each.is_known = False
+        each.is_open = False
+        each.save()
+
+    return redirect('index')
+
