@@ -13,7 +13,9 @@
 <div class="pictures">
     {% for each in pictures %}
     <div>
+    {% if not each.clicked %}
         <form class="pic" method='post' action="{% url 'edit' each.pk %}">
+
                 <button class="pic">
                     {% if each.is_open or each.is_known %}
                      <img src='{{ each.pic.url }}'  alt="pic_cards" width="200px" height="200">
@@ -23,6 +25,14 @@
                 </button>
                 {% csrf_token %}
             </form>
+    {% else %}
+                    {% if each.is_open or each.is_known %}
+                     <img src='{{ each.pic.url }}'  alt="pic_cards" width="200px" height="200">
+                    {% else %}
+                    <img src='{{ secret.pic.url }}'  alt="pic_cards" width="200px" height="200">
+                    {% endif %}
+
+    {% endif %}
     </div>
     {% endfor %}
 </div>

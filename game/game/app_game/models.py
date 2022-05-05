@@ -15,3 +15,6 @@ class Picture(models.Model):
     order=models.IntegerField(
         default=0
     )
+    clicked = models.BooleanField(
+        default=False,
+    )
