@@ -19,6 +19,7 @@ class IndexView(views.TemplateView):
         if all([x.is_known for x in Picture.objects.all().filter(order__gt=0)]):
             for each in Picture.objects.all():
                 each.is_known = False
+                each.is_open=False
                 each.save()
         context = super().get_context_data(**kwargs)
         pictures = Picture.objects.all().order_by('order').filter(order__gt=0)
@@ -67,8 +68,8 @@ def update_pic(request,pk):
         Counter.NAME_SECOND_PIC=pic_for_update.name
         Counter.ID_SECOND_PIC = pk
 
-    print(pk)
-    print(Counter.NAME_FISRT_PIC)
-    print(Counter.NAME_SECOND_PIC)
+    # print(pk)
+    # print(Counter.NAME_FISRT_PIC)
+    # print(Counter.NAME_SECOND_PIC)
 
     return redirect('index')
