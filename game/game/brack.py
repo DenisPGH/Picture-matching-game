@@ -110,3 +110,16 @@
 # else:  # not cliced on same type
 #     pass
 # Helper.COUNTER_OPENED_IMAGES+=1
+
+#########
+""" return not allways two from the group"""
+# order_numbers=Picture.objects.values_list('id',flat=True)
+# order=random.sample(list(order_numbers),len(order_numbers))
+#
+#
+# pictures = Picture.objects.order_by('id').filter(id__in=order)
+# print(order)
+# print(pictures)
+# valid_profiles_id_list = Picture.objects.values_list('id', flat=True)
+# random_profiles_id_list = random.sample(list(valid_profiles_id_list), min(len(valid_profiles_id_list), 16))
+# pictures = Picture.objects.filter(id__in=random_profiles_id_list)

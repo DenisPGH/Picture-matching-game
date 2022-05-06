@@ -13,7 +13,7 @@ class Helper:
     # NAME_SECOND_PIC=''
     # ID_FIRST_PIC = 0
     # ID_SECOND_PIC = 0
-    # LAST_CLICKED_PIC_ID= 0
+    LAST_CLICKED_PIC_ID= 0
     LAST_CLICKED_PIC_NAME= ''
     CLICKED_NAMES=[]
 
@@ -22,18 +22,7 @@ class IndexView(views.TemplateView):
     template_name = 'index.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        #pictures = Picture.objects.all().order_by('order').filter(order__gt=0)
-
-        order_numbers=Picture.objects.values_list('order',flat=True)
-        my_random_order=random.sample(list(order_numbers),len(order_numbers))
-        print(my_random_order)
-
-        pictures = Picture.objects.filter(order__in = my_random_order)
-        print(pictures)
-
-
-
+        pictures = Picture.objects.all().order_by('order').filter(order__lt=17)
         secret=SecretPic.objects.get(order=0)
         context['pictures']=pictures
         context['secret']=secret
