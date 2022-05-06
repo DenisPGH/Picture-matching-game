@@ -1,4 +1,5 @@
 import random
+import time
 
 from django.shortcuts import render, redirect
 from django.views import generic as views
