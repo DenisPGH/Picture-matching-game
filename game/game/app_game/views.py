@@ -1,8 +1,11 @@
+import random
+
 from django.shortcuts import render, redirect
 from django.views import generic as views
 
 # Create your views here.
-from game.app_game.models import Picture
+from game.app_game.models import Picture, SecretPic
+
 
 class Helper:
     COUNTER_OPENED_IMAGES=0
@@ -19,8 +22,11 @@ class IndexView(views.TemplateView):
     template_name = 'index.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        pictures = Picture.objects.all().order_by('order').filter(order__gt=0)
-        secret=Picture.objects.get(order=0)
+        #pictures = Picture.objects.all().order_by('order').filter(order__gt=0)
+        order_numbers=Picture.objects.values_list('order',flat=True)
+        my_order=random.sample(list(order_numbers),max(order_numbers))
+        pictures = Picture.objects.filter(order__in=my_order)
+        secret=SecretPic.objects.get(order=0)
         context['pictures']=pictures
         context['secret']=secret
         return context
