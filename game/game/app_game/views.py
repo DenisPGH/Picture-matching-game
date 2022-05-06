@@ -62,7 +62,7 @@ def update_pic(request, pk):
         each.is_open = False
         # each.clicked=False
         each.save()
-  
+
     pic_for_update = Picture.objects.get(pk=pk)
     pic_for_update.is_open = True
     pic_for_update.save()
