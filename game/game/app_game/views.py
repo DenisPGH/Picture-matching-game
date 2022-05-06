@@ -8,12 +8,12 @@ from game.app_game.models import Picture, SecretPic
 
 
 class Helper:
-    COUNTER_OPENED_IMAGES=0
-    NAME_FISRT_PIC=''
-    NAME_SECOND_PIC=''
-    ID_FIRST_PIC = 0
-    ID_SECOND_PIC = 0
-    LAST_CLICKED_PIC_ID= 0
+    # COUNTER_OPENED_IMAGES=0
+    # NAME_FISRT_PIC=''
+    # NAME_SECOND_PIC=''
+    # ID_FIRST_PIC = 0
+    # ID_SECOND_PIC = 0
+    # LAST_CLICKED_PIC_ID= 0
     LAST_CLICKED_PIC_NAME= ''
     CLICKED_NAMES=[]
 
@@ -22,10 +22,18 @@ class IndexView(views.TemplateView):
     template_name = 'index.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         #pictures = Picture.objects.all().order_by('order').filter(order__gt=0)
+
         order_numbers=Picture.objects.values_list('order',flat=True)
-        my_order=random.sample(list(order_numbers),max(order_numbers))
-        pictures = Picture.objects.filter(order__in=my_order)
+        my_random_order=random.sample(list(order_numbers),len(order_numbers))
+        print(my_random_order)
+
+        pictures = Picture.objects.filter(order__in = my_random_order)
+        print(pictures)
+
+
+
         secret=SecretPic.objects.get(order=0)
         context['pictures']=pictures
         context['secret']=secret
