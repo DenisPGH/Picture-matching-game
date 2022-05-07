@@ -21,13 +21,30 @@ class Helper:
 
 class IndexView(views.TemplateView):
     template_name = 'index.html'
+    VALUE_PAIRS_PICTRURES=8 # allways *2
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        pictures = Picture.objects.all().order_by('order').filter(order__lt=17)
+        # take value of wishes pictures pairs
+        all_names_pictures=set(x.name for x in Picture.objects.all())
+        random_names = random.sample(list(all_names_pictures), min(len(all_names_pictures), self.VALUE_PAIRS_PICTRURES))
+        pictures = Picture.objects.filter(name__in=random_names)
+
+        # take a random order for the choosed pictures
+        valid_ids_list = pictures.values_list('id', flat=True)
+        random_ids_list = random.sample(list(valid_ids_list), min(len(valid_ids_list), len(pictures)))
+        pictures_list=[]
+        for each_id in random_ids_list:
+            pictures_list.append(Picture.objects.get(id=each_id))
+        pictures = pictures.filter(id__in=random_ids_list)
+
+        # return the values
         secret=SecretPic.objects.get(order=0)
-        context['pictures']=pictures
+        context['pictures']=pictures_list
         context['secret']=secret
         return context
+
+
+
 
 def restart(request):
     Helper.LAST_CLICKED_PIC_NAME = ''
