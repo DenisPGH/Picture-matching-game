@@ -54,14 +54,19 @@ class RandomGeneratedPics:
 
 class IndexView(views.TemplateView):
     template_name = 'index.html'
-    VALUE_PAIRS_PICTRURES=6 # *2
+    VALUE_PAIRS_PICTRURES=12 # *2
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        pictures=Picture.objects.filter(id__in=RandomGeneratedPics.ID_LIST)
-        print(pictures)
+
+        pictures_list = []
+        for each_id in RandomGeneratedPics.ID_LIST:
+            pictures_list.append(Picture.objects.get(id=each_id))
+
+
+
         # return the values
         secret=SecretPic.objects.get(order=0)
-        context['pictures']=pictures
+        context['pictures']=pictures_list
         context['secret']=secret
         return context
 
