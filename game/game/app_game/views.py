@@ -9,17 +9,13 @@ from game.app_game.models import Picture, SecretPic
 
 
 class Helper:
-    # COUNTER_OPENED_IMAGES=0
-    # NAME_FISRT_PIC=''
-    # NAME_SECOND_PIC=''
-    # ID_FIRST_PIC = 0
-    # ID_SECOND_PIC = 0
+
     LAST_CLICKED_PIC_ID= 0
     LAST_CLICKED_PIC_NAME= ''
 
 
 """ den"""
-class RandomGeneratedPics:
+class HelperRandomFuctions:
     RANDOM_LIST_OF_PICS=[]
     ID_LIST=[]
     CURRENT_QUERYSET=[]
@@ -38,32 +34,28 @@ class RandomGeneratedPics:
         for each_id in random_ids_list:
             pictures_list.append(Picture.objects.get(id=each_id))
         # pictures = pictures.filter(id__in=random_ids_list)
-        RandomGeneratedPics.RANDOM_LIST_OF_PICS=pictures_list
+        HelperRandomFuctions.RANDOM_LIST_OF_PICS=pictures_list
 
         return pictures_list
     @staticmethod
     def return_ids_choosed_pics():
         """ store the new values of ids, and queryset"""
-        id_list=[x.id for x in RandomGeneratedPics.RANDOM_LIST_OF_PICS]
-        RandomGeneratedPics.ID_LIST=id_list
-        RandomGeneratedPics.CURRENT_QUERYSET=Picture.objects.filter(id__in=RandomGeneratedPics.ID_LIST)
+        id_list=[x.id for x in HelperRandomFuctions.RANDOM_LIST_OF_PICS]
+        HelperRandomFuctions.ID_LIST=id_list
+        HelperRandomFuctions.CURRENT_QUERYSET=Picture.objects.filter(id__in=HelperRandomFuctions.ID_LIST)
 
-        return RandomGeneratedPics.ID_LIST
+        return HelperRandomFuctions.ID_LIST
 
 
 
 class IndexView(views.TemplateView):
     template_name = 'index.html'
-    VALUE_PAIRS_PICTRURES=12 # *2
+    VALUE_PAIRS_PICTRURES=15 # *2
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        pictures_list = []
-        for each_id in RandomGeneratedPics.ID_LIST:
+        pictures_list = [] # new queryset with current order
+        for each_id in HelperRandomFuctions.ID_LIST:
             pictures_list.append(Picture.objects.get(id=each_id))
-
-
-
         # return the values
         secret=SecretPic.objects.get(order=0)
         context['pictures']=pictures_list
@@ -74,9 +66,10 @@ class IndexView(views.TemplateView):
 
 
 def restart(request):
-    RandomGeneratedPics.ID_LIST = []
-    RandomGeneratedPics.return_ids_choosed_pics()
-    RandomGeneratedPics.return_random_list(IndexView.VALUE_PAIRS_PICTRURES)
+    """ restart all rulls, start new game"""
+    HelperRandomFuctions.ID_LIST = []
+    HelperRandomFuctions.return_ids_choosed_pics()
+    HelperRandomFuctions.return_random_list(IndexView.VALUE_PAIRS_PICTRURES)
     Helper.LAST_CLICKED_PIC_NAME = ''
     for each in Picture.objects.all():
         each.is_known = False
@@ -89,31 +82,31 @@ def restart(request):
 
 def update_pic(request, pk):
     current_clicked_picture_name=Picture.objects.get(pk=pk).name
+    """ update the info of last clicked pic, it could be click again"""
     if Helper.LAST_CLICKED_PIC_ID != 0:
         update_last_clicked = Picture.objects.get(pk=Helper.LAST_CLICKED_PIC_ID)
         update_last_clicked.clicked = False
         update_last_clicked.save()
-
+    """ check if last and current clicked are same"""
     if current_clicked_picture_name==Helper.LAST_CLICKED_PIC_NAME:
         machted_pictures = Picture.objects.filter(name=current_clicked_picture_name)
         Helper.LAST_CLICKED_PIC_NAME=''
         for each in machted_pictures:
             each.is_known = True
             each.save()
-
+    """ update the value of last clicked pictures"""
     Helper.LAST_CLICKED_PIC_ID = pk
     Helper.LAST_CLICKED_PIC_NAME = current_clicked_picture_name
-
+    """ update the current clicked picture, to be clicked, cant click two times on it"""
     clicked_pic = Picture.objects.get(pk=pk)
     clicked_pic.clicked = True
     clicked_pic.save()
 
+    """ close all pictures"""
     for each in Picture.objects.all():
-        # each.is_known = False
         each.is_open = False
-        # each.clicked=False
         each.save()
-
+    """ open only the clicked picture"""
     pic_for_update = Picture.objects.get(pk=pk)
     pic_for_update.is_open = True
     pic_for_update.save()
