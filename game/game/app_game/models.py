@@ -35,3 +35,19 @@ class SecretPic(models.Model):
     clicked = models.BooleanField(
         default=False,
     )
+
+
+class Field(models.Model):
+    two='2x2'
+    four='4x4'
+    five='6x4'
+    six='6x6'
+
+    matrix=models.CharField(
+        max_length=100,
+        choices=((two,two),
+                 (four,four),
+                 (five,five),
+                 (six,six),
+                 )
+    )

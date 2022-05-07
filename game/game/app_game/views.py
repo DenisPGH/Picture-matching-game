@@ -2,10 +2,12 @@ import random
 import time
 
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.views import generic as views
+from django import forms
 
 # Create your views here.
-from game.app_game.models import Picture, SecretPic
+from game.app_game.models import Picture, SecretPic, Field
 
 
 class InfoLastClickedPic:
@@ -20,7 +22,8 @@ class HelperRandomFuctions:
     CURRENT_QUERYSET=[]
 
     def return_random_list(pairs:int):
-        """this function generate random queryset for current game"""
+        """this function generate random queryset for current game
+        it got count of the pairs"""
         # take value of wishes pictures pairs
         all_names_pictures = set(x.name for x in Picture.objects.all())
         random_names = random.sample(list(all_names_pictures), min(len(all_names_pictures), pairs))
@@ -50,7 +53,7 @@ class HelperRandomFuctions:
 class IndexView(views.TemplateView):
     """ show the html with the game, and pictures"""
     template_name = 'index.html'
-    VALUE_PAIRS_PICTRURES=15 # *2
+    VALUE_PAIRS_PICTRURES=16
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pictures_list = [] # new queryset with current order
@@ -69,7 +72,8 @@ def restart(request):
     """ restart all rulls, start new game"""
     HelperRandomFuctions.ID_LIST = []
     HelperRandomFuctions.return_ids_choosed_pics()
-    HelperRandomFuctions.return_random_list(IndexView.VALUE_PAIRS_PICTRURES)
+    HelperRandomFuctions.return_random_list(IndexView.VALUE_PAIRS_PICTRURES)  # old
+    #HelperRandomFuctions.return_random_list(int(Field.objects.last().matrix.split('x')[0])) # new
     InfoLastClickedPic.LAST_CLICKED_PIC_NAME = ''
     for each in Picture.objects.all():
         each.is_known = False
@@ -111,4 +115,37 @@ def update_pic(request, pk):
     pic_for_update.is_open = True
     pic_for_update.save()
     return redirect('index')
+
+
+
+
+"""some tests """
+class FieldForm(forms.ModelForm):
+    class Meta:
+        model = Field
+        fields = ('matrix',)
+
+
+class ChoiseNewFiled(views.CreateView):
+
+    template_name = 'choice.html'
+    model = Field
+    fields = '__all__'
+    # form_class = FieldForm
+    # # def get_context_object_name(self, obj):
+    # #     print(f'test={self.object.id}')
+    # # def get_context_data(self, **kwargs):
+    # #     context = super().get_context_data(**kwargs)
+    # #     #print(context['view'])
+    # #     return context
+    success_url = reverse_lazy('index')
+    # #
+    # def form_valid(self, form):
+    #     print(f'test={self.kwargs["matrix"]}')
+    #     print(self.content_type)
+    #
+    #     return super(ChoiseNewFiled,self).form_valid(form)
+
+
+
 

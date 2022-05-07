@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+     <form class="choose" method='post' action="{% url 'choice' %}">
+         {{ form.as_p }}
+                <button class="pic">Choose size
+                </button>
+                {% csrf_token %}
+            </form>
+
+</div>
+
+
+</body>
+</html>
