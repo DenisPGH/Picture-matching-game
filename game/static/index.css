@@ -9,7 +9,7 @@ div.pictures {
   /*!*height: 300px;*!*/
   /*  flex-wrap: wrap;*/
     display: inline-grid;
-  grid-template-columns: repeat(4, [col-start] 1fr);
+  grid-template-columns: repeat(6, [col-start] 1fr);
   grid-gap: 10px;
     margin-left: 17rem;
 

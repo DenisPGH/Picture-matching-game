@@ -16,30 +16,52 @@ class Helper:
     # ID_SECOND_PIC = 0
     LAST_CLICKED_PIC_ID= 0
     LAST_CLICKED_PIC_NAME= ''
-    CLICKED_NAMES=[]
 
 
-class IndexView(views.TemplateView):
-    template_name = 'index.html'
-    VALUE_PAIRS_PICTRURES=8 # allways *2
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+""" den"""
+class RandomGeneratedPics:
+    RANDOM_LIST_OF_PICS=[]
+    ID_LIST=[]
+    CURRENT_QUERYSET=[]
+
+    def return_random_list(pairs:int):
+        """this function generate random queryset for current game"""
         # take value of wishes pictures pairs
-        all_names_pictures=set(x.name for x in Picture.objects.all())
-        random_names = random.sample(list(all_names_pictures), min(len(all_names_pictures), self.VALUE_PAIRS_PICTRURES))
+        all_names_pictures = set(x.name for x in Picture.objects.all())
+        random_names = random.sample(list(all_names_pictures), min(len(all_names_pictures), pairs))
         pictures = Picture.objects.filter(name__in=random_names)
 
         # take a random order for the choosed pictures
         valid_ids_list = pictures.values_list('id', flat=True)
         random_ids_list = random.sample(list(valid_ids_list), min(len(valid_ids_list), len(pictures)))
-        pictures_list=[]
+        pictures_list = []
         for each_id in random_ids_list:
             pictures_list.append(Picture.objects.get(id=each_id))
-        pictures = pictures.filter(id__in=random_ids_list)
+        # pictures = pictures.filter(id__in=random_ids_list)
+        RandomGeneratedPics.RANDOM_LIST_OF_PICS=pictures_list
 
+        return pictures_list
+    @staticmethod
+    def return_ids_choosed_pics():
+        """ store the new values of ids, and queryset"""
+        id_list=[x.id for x in RandomGeneratedPics.RANDOM_LIST_OF_PICS]
+        RandomGeneratedPics.ID_LIST=id_list
+        RandomGeneratedPics.CURRENT_QUERYSET=Picture.objects.filter(id__in=RandomGeneratedPics.ID_LIST)
+
+        return RandomGeneratedPics.ID_LIST
+
+
+
+class IndexView(views.TemplateView):
+    template_name = 'index.html'
+    VALUE_PAIRS_PICTRURES=6 # *2
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pictures=Picture.objects.filter(id__in=RandomGeneratedPics.ID_LIST)
+        print(pictures)
         # return the values
         secret=SecretPic.objects.get(order=0)
-        context['pictures']=pictures_list
+        context['pictures']=pictures
         context['secret']=secret
         return context
 
@@ -47,6 +69,9 @@ class IndexView(views.TemplateView):
 
 
 def restart(request):
+    RandomGeneratedPics.ID_LIST = []
+    RandomGeneratedPics.return_ids_choosed_pics()
+    RandomGeneratedPics.return_random_list(IndexView.VALUE_PAIRS_PICTRURES)
     Helper.LAST_CLICKED_PIC_NAME = ''
     for each in Picture.objects.all():
         each.is_known = False
@@ -65,7 +90,7 @@ def update_pic(request, pk):
         update_last_clicked.save()
 
     if current_clicked_picture_name==Helper.LAST_CLICKED_PIC_NAME:
-        machted_pictures = Picture.objects.all().filter(name=current_clicked_picture_name)
+        machted_pictures = Picture.objects.filter(name=current_clicked_picture_name)
         Helper.LAST_CLICKED_PIC_NAME=''
         for each in machted_pictures:
             each.is_known = True
