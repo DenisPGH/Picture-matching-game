@@ -8,13 +8,12 @@ from django.views import generic as views
 from game.app_game.models import Picture, SecretPic
 
 
-class Helper:
-
+class InfoLastClickedPic:
     LAST_CLICKED_PIC_ID= 0
     LAST_CLICKED_PIC_NAME= ''
 
 
-""" den"""
+
 class HelperRandomFuctions:
     RANDOM_LIST_OF_PICS=[]
     ID_LIST=[]
@@ -49,6 +48,7 @@ class HelperRandomFuctions:
 
 
 class IndexView(views.TemplateView):
+    """ show the html with the game, and pictures"""
     template_name = 'index.html'
     VALUE_PAIRS_PICTRURES=15 # *2
     def get_context_data(self, **kwargs):
@@ -70,7 +70,7 @@ def restart(request):
     HelperRandomFuctions.ID_LIST = []
     HelperRandomFuctions.return_ids_choosed_pics()
     HelperRandomFuctions.return_random_list(IndexView.VALUE_PAIRS_PICTRURES)
-    Helper.LAST_CLICKED_PIC_NAME = ''
+    InfoLastClickedPic.LAST_CLICKED_PIC_NAME = ''
     for each in Picture.objects.all():
         each.is_known = False
         each.is_open = False
@@ -83,20 +83,20 @@ def restart(request):
 def update_pic(request, pk):
     current_clicked_picture_name=Picture.objects.get(pk=pk).name
     """ update the info of last clicked pic, it could be click again"""
-    if Helper.LAST_CLICKED_PIC_ID != 0:
-        update_last_clicked = Picture.objects.get(pk=Helper.LAST_CLICKED_PIC_ID)
+    if InfoLastClickedPic.LAST_CLICKED_PIC_ID != 0:
+        update_last_clicked = Picture.objects.get(pk=InfoLastClickedPic.LAST_CLICKED_PIC_ID)
         update_last_clicked.clicked = False
         update_last_clicked.save()
     """ check if last and current clicked are same"""
-    if current_clicked_picture_name==Helper.LAST_CLICKED_PIC_NAME:
+    if current_clicked_picture_name==InfoLastClickedPic.LAST_CLICKED_PIC_NAME:
         machted_pictures = Picture.objects.filter(name=current_clicked_picture_name)
-        Helper.LAST_CLICKED_PIC_NAME=''
+        InfoLastClickedPic.LAST_CLICKED_PIC_NAME= ''
         for each in machted_pictures:
             each.is_known = True
             each.save()
     """ update the value of last clicked pictures"""
-    Helper.LAST_CLICKED_PIC_ID = pk
-    Helper.LAST_CLICKED_PIC_NAME = current_clicked_picture_name
+    InfoLastClickedPic.LAST_CLICKED_PIC_ID = pk
+    InfoLastClickedPic.LAST_CLICKED_PIC_NAME = current_clicked_picture_name
     """ update the current clicked picture, to be clicked, cant click two times on it"""
     clicked_pic = Picture.objects.get(pk=pk)
     clicked_pic.clicked = True
